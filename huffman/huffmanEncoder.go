@@ -3,6 +3,7 @@ package huffman
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -23,6 +24,7 @@ type HuffmanEncoder struct {
 func NewEncoder(fileToEncode string) *HuffmanEncoder {
 	mp, err := utils.CharFreqMap(fileToEncode)
 	if err != nil {
+		fmt.Println(err)
 		return nil
 	}
 
@@ -41,6 +43,8 @@ func (he *HuffmanEncoder) Encode(out string) error {
 		return err
 	}
 
+	fmt.Println(f, he)
+
 	defer f.Close()
 
 	// writing metadata for decoding the compressed(huffman-encoded) file
@@ -48,6 +52,9 @@ func (he *HuffmanEncoder) Encode(out string) error {
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("here")
+
 	paddedBits := he.paddedBitsCount()
 	err = he.writeJSON(f, map[string]int{"bit_count": paddedBits})
 	if err != nil {
@@ -173,6 +180,8 @@ func (he *HuffmanEncoder) writeJSON(w io.Writer, v any) error {
 		return err
 	}
 
+	// fmt.Println("here")
+
 	_, err = w.Write(freqMapBytes)
 	if err != nil {
 		log.Printf("error: writing marshalled bytes of %#v %q", v, err)
@@ -188,8 +197,14 @@ func (he *HuffmanEncoder) paddedBitsCount() int {
 	for cr, ct := range he.charFreqMap {
 		count = (count + (len(he.huffmanByteRpr[cr])*ct)%8) % 8
 	}
+	count = count % 8
 
-	he.paddedBits = count % 8
+	if count == 0{
+		he.paddedBits = 0
+	}else{
+		he.paddedBits = 8 - count
+	}
+
 
 	return he.paddedBits
 }

@@ -17,15 +17,6 @@ func CharFreqMap(filepath string) (map[rune]int, error) {
 
 	defer f.Close()
 
-	f1, err := os.Create(`D:\coding-challenges\HuffmanEncodingDecoding\out2.txt`)
-	if err != nil {
-		return nil, err
-	}
-
-	bw := bufio.NewWriter(f1)
-
-	defer f1.Close()
-
 	fmp := make(map[rune]int)
 
 	s := bufio.NewScanner(f)
@@ -42,8 +33,6 @@ func CharFreqMap(filepath string) (map[rune]int, error) {
 		log.Printf("err: CharFreqMap %q", err)
 		return nil, err
 	}
-
-	bw.Flush()
 
 	return fmp, nil
 
